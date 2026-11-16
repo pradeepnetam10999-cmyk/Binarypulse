@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PulseBinary — Live Demo Binary Trading</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="top-bar">
+      <div class="brand-wrap">
+        <div class="brand-logo">PB</div>
+        <div>
+          <div class="brand-title">PulseBinary</div>
+          <div class="live-status" id="liveStatus">
+            <span class="dot connecting"></span>
+            <span id="liveStatusText">Connecting...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="voiceToggleBtn" class="icon-btn voice-on" title="Toggle Voice Signal Alerts">
+          🔊 <span id="voiceLabel">Voice ON</span>
+        </button>
+        <div class="balance-box">
+          <span class="balance-label">DEMO</span>
+          <span class="balance-value" id="demoBalance">$10,000.00</span>
+          <button id="resetBalanceBtn" class="reset-btn" title="Reset Demo Balance to $10,000">↺</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Asset & Chart Controls -->
+    <section class="toolbar">
+      <div class="toolbar-group">
+        <select id="assetSelect" class="select-input">
+          <option value="BTCUSDT">BTC / USDT</option>
+          <option value="ETHUSDT">ETH / USDT</option>
+          <option value="SOLUSDT">SOL / USDT</option>
+          <option value="BNBUSDT">BNB / USDT</option>
+          <option value="XRPUSDT">XRP / USDT</option>
+        </select>
+
+        <div class="timeframe-pills" id="timeframePills">
+          <button class="tf-btn" data-tf="5s">5s</button>
+          <button class="tf-btn" data-tf="15s">15s</button>
+          <button class="tf-btn active" data-tf="1m">1m</button>
+          <button class="tf-btn" data-tf="3m">3m</button>
+          <button class="tf-btn" data-tf="5m">5m</button>
+          <button class="tf-btn" data-tf="15m">15m</button>
+        </div>
+      </div>
+
+      <div class="toolbar-group right">
+        <button id="chartTypeBtn" class="pill-btn active" title="Switch Candles / Area">Candles</button>
+        <button id="indicatorsBtn" class="pill-btn active" title="Toggle EMA & RSI">EMA+RSI</button>
+      </div>
+    </section>
+
+    <!-- Signal & Market Status Banner -->
+    <section class="signal-banner neutral" id="signalBanner">
+      <div class="signal-left">
+        <span class="signal-badge" id="signalBadge">SCANNING</span>
+        <span class="signal-text" id="signalText">Analyzing live market candles...</span>
+      </div>
+      <div class="signal-metrics">
+        <span class="metric-pill" id="rsiBadge">RSI: --</span>
+        <span class="metric-pill" id="signalAccBadge">Sig Win: --</span>
+        <span class="metric-pill timer-pill" id="candleTimer">00:00</span>
+      </div>
+    </section>
+
+    <!-- Live Chart Area -->
+    <main class="chart-wrapper">
+      <canvas id="chartCanvas"></canvas>
+
+      <div class="ohlc-overlay" id="ohlcOverlay">
+        <span>O: <b id="ohlcO">--</b></span>
+        <span>H: <b id="ohlcH">--</b></span>
+        <span>L: <b id="ohlcL">--</b></span>
+        <span>C: <b id="ohlcC">--</b></span>
+      </div>
+
+      <div class="zoom-controls">
+        <button id="zoomInBtn" class="zoom-btn" title="Zoom In">+</button>
+        <button id="zoomOutBtn" class="zoom-btn" title="Zoom Out">−</button>
+        <button id="zoomResetBtn" class="zoom-btn" title="Follow Latest">⌖</button>
+      </div>
+    </main>
+
+    <!-- Trade Control Panel -->
+    <section class="trade-panel">
+      <div class="trade-inputs">
+        <div class="input-card">
+          <div class="input-header">
+            <span>Amount</span>
+            <div class="quick-amounts">
+              <button class="qa-btn" data-amt="10">$10</button>
+              <button class="qa-btn" data-amt="50">$50</button>
+              <button class="qa-btn" data-amt="100">$100</button>
+            </div>
+          </div>
+          <div class="stepper">
+            <button id="amtMinus" class="step-btn">−</button>
+            <input type="number" id="tradeAmount" value="50" min="1" max="10000" />
+            <button id="amtPlus" class="step-btn">+</button>
+          </div>
+        </div>
+
+        <div class="input-card">
+          <div class="input-header">
+            <span>Expiry</span>
+            <span class="payout-tag">Payout 85%</span>
+          </div>
+          <div class="expiry-pills" id="expiryPills">
+            <button class="exp-btn" data-sec="30">30s</button>
+            <button class="exp-btn active" data-sec="60">1m</button>
+            <button class="exp-btn" data-sec="180">3m</button>
+            <button class="exp-btn" data-sec="300">5m</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="trade-buttons">
+        <button id="callBtn" class="trade-btn call">
+          <span class="btn-main">UP (CALL) ↑</span>
+          <span class="btn-sub" id="callReturn">Return $92.50</span>
+        </button>
+        <button id="putBtn" class="trade-btn put">
+          <span class="btn-main">DOWN (PUT) ↓</span>
+          <span class="btn-sub" id="putReturn">Return $92.50</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Active Trades & History -->
+    <section class="trades-section">
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="active">Active Trades (<span id="activeCount">0</span>)</button>
+        <button class="tab-btn" data-tab="history">History (<span id="winRateBadge">0% Win</span>)</button>
+      </div>
+      <div id="tradesList" class="trades-list"></div>
+    </section>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
